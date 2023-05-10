@@ -1,0 +1,45 @@
+version: '3'
+services:
+  mysql-test0:
+    image: mysql:5.7
+    container_name: mysql-test0
+    networks:
+      - net
+    environment:
+      - MYSQL_ROOT_PASSWORD=mypwd
+      - MYSQL_DATABASE=test
+    ports:
+      - 33063:3306
+
+  svc10:
+    image: sakuravx/docker-test:1.6
+    container_name: svc10
+    networks:
+      - net
+    environment:
+      - SVC_ID=svc10
+      - REQUESTED_SERVICE_NAME=svc20
+      - MYSQL_CONTAINER_NAME=mysql-test0
+      - MYSQL_ROOT_PASSWORD=mypwd
+    ports:
+      - 10090:8080
+    depends_on:
+      - mysql-test0
+
+  svc20:
+    image: sakuravx/docker-test:1.6
+    container_name: svc20
+    networks:
+      - net
+    environment:
+      - SVC_ID=svc20
+      - REQUESTED_SERVICE_NAME=svc10
+      - MYSQL_CONTAINER_NAME=mysql-test0
+      - MYSQL_ROOT_PASSWORD=mypwd
+    ports:
+      - 10091:8080
+    depends_on:
+      - mysql-test0
+
+networks:
+  net:
